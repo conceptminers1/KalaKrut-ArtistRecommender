@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Artist Recommendations</title>
+</head>
+<body>
+  <h1>Your KalaKrut Recommended Artists:</h1>
+  <ul>
+    {% if recommendations %}
+      {% for artist in recommendations %}
+        <li>{{ artist }}</li>
+      <!-{% endfor %}-->
+    {% else %}
+      <li>No recommendations yet. Please use the form to submit your criteria.</li>
+    {% endif %}
+  </ul>
+  <h2>Join KalaKrut Platform Community for Your Benefits. It's Free! </h2>
+  <a href>https://linktr.ee/KalaKrutPlatform</href></a>
+  <h3>Copy above link as text and paste in your browser to check our activities.(as currently we are on a free plan on this coding platform) </h3>
+</body>
+</html>

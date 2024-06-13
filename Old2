@@ -1,0 +1,96 @@
+from flask import Flask, render_template, request
+import pandas as pd
+
+# Load data from CSV
+data = pd.read_csv("artists.csv")
+
+# Define function to filter artists based on user selection
+def recommend_artists(genre, subgenre, location, min_discography, min_deals):
+  # Convert 'Discography (Count)' column to integers
+  data["Discography (Count)"] = data["Discography (Count)"].astype(int)
+
+  filtered_data = data[
+      (data["Genre"] == genre) & (data["Subgenres"].str.contains(subgenre))
+      & (data["Location"] == location) & (data["Discography (Count)"] >= min_discography)
+      & (data["Deals Completed"] >= min_deals)
+  ]
+  # You can implement a more sophisticated recommendation algorithm here
+  recommendations = filtered_data.sample(5)["Name"].tolist()  # Randomly select 5 artists
+  return recommendations
+
+app = Flask(__name__)
+
+@app.route("/")
+def home():
+  genres = data["Genre"].unique().tolist()
+  locations = data["Location"].unique().tolist()
+  return render_template("index.html", genres=genres, locations=locations)
+
+@app.route("/recommend", methods=["POST"])
+def recommend():
+  genre = request.form["genre"]
+  subgenre = request.form["subgenre"]
+  location = request.form["location"]
+  min_discography = int(request.form["min_discography"])
+  min_deals = int(request.form["min_deals"])
+  recommendations = recommend_artists(genre, subgenre, location, min_discography, min_deals)
+  return render_template("recommendations.html", recommendations=recommendations)
+
+if __name__ == "__main__":
+  app.run(debug=True)<!DOCTYPE html>
+<html>
+<head>
+  <title>Artist Recommendations</title>
+</head>
+<body>
+  <h1>Your Recommended Artists:</h1>
+  <ul>
+    {% if recommendations %}
+      {% for artist in recommendations %}
+        <li>{{ artist }}</li>
+      {% endfor %}
+    {% else %}
+      <li>No recommendations yet. Please use the form to submit your criteria.</li>
+    {% endfor %}
+  </ul>
+</body>
+</html>from flask import Flask, render_template, request
+import pandas as pd
+
+# Load data from CSV
+data = pd.read_csv("artists.csv", index_col=0)  # Set the first column as the index
+
+# Define function to filter artists based on user selection
+def recommend_artists(genre, subgenre, location, min_discography, min_deals):
+  # Convert 'Discography (Count)' column to integers
+  data["Discography (Count)"] = data["Discography (Count)"].astype(int)
+
+  filtered_data = data[
+      (data["Genre"] == genre) & (data["Subgenres"].str.contains(subgenre))
+      & (data["Location"] == location) & (data["Discography (Count)"] >= min_discography)
+      & (data["Deals Completed"] >= min_deals)
+  ]
+  # You can implement a more sophisticated recommendation algorithm here
+  recommendations = filtered_data.sample(5)["Name"].tolist()  # Randomly select 5 artists
+  return recommendations
+
+app = Flask(__name__)
+
+@app.route("/")
+def home():
+  genres = data["Genre"].unique().tolist()
+  locations = data["Location"].unique().tolist()
+  return render_template("index.html", genres=genres, locations=locations)
+
+@app.route("/recommend", methods=["POST"])
+def recommend():
+  genre = request.form["genre"]
+  subgenre = request.form["subgenre"]
+  location = request.form["location"]
+  min_discography = int(request.form["min_discography"])
+  min_deals = int(request.form["min_deals"])
+  recommendations = recommend_artists(genre, subgenre, location, min_discography, min_deals)
+  return render_template("recommendations.html", recommendations=recommendations)
+
+if __name__ == "__main__":
+  app.run(debug=True)

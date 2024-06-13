@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>KalaKrut Artist Recommender</title>
+</head>
+<body>
+  <h1>Find Artists from KalaKrut Platform!</h1>
+<font size = "-3">Select Genre, Location and Enter 0 or 1 in the boxes next to Minimum Discography Count and Minimum Deals Completed. If entries exist in the data you will get the Name and Email of the artist as a recommendation.</font>
+    
+  <form action="/recommend" method="POST">
+    <br>
+    Genre:
+    <select name="genre">
+      {% for genre in genres %}
+        <option value="{{ genre }}">{{ genre }}</option>
+      {% endfor %}
+    </select>
+    <br>
+    Subgenre (optional):
+    <input type="text" name="subgenre">
+    <br>
+    Location (optional):
+    <select name="location">
+      {% for location in locations %}
+        <option value="{{ location }}">{{ location }}</option>
+      {% endfor %}
+    </select>
+    <br>
+    Minimum Discography Count:
+    <input type="number" name="min_discography" min="0">
+    <br>
+    Minimum Deals Completed:
+    <input type="number" name="min_deals" min="0">
+    <br>
+    <button type="submit">Recommend Artists</button>
+  </form>
+<br>
+  <font size = "-3"> Project and Synthetic Data for KalaKrut Artist Recommender are evolving and under active development. It's not best yet but anyways...Enjoy the Example!</font>
+<p>
+  <font size = "-7">Python-synth Data and KalaKrut Artist Reccomender © 2024 by Bhoomin Pandya, ConceptMiners, KalaKrut Platform is licensed under Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International. To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-nd/4.0/</font></p>
+</body>
+</html>

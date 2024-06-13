@@ -1,0 +1,58 @@
+import pandas as pd
+from flask import Flask, render_template, request
+
+# Load data from CSV
+data = pd.read_csv("artists.csv", index_col=0)
+
+# Define function to filter artists based on user selection
+def recommend_artists(genre, subgenre, location, min_discography, min_deals):
+    # Convert 'Discography (Count)' and 'Deals Completed' to integers, handling missing values
+    data["Discography (Count)"] = pd.to_numeric(
+        data["Discography (Count)"].replace("", 0), errors="coerce"
+    )  # Fill empty strings with 0, coerce other errors
+    data["Deals Completed"] = pd.to_numeric(
+        data["Deals Completed"].replace("", 0), errors="coerce"
+    )
+
+    filtered_data = data[
+        (data["Genre"] == genre)
+        & (data["Subgenres"].str.contains(subgenre))
+        & (data["Location"] == location)
+        & (data["Discography (Count)"] >= min_discography)
+        & (data["Deals Completed"] >= min_deals)
+    ]
+
+    # Check if there are enough recommendations
+    if len(filtered_data) < 5:
+        # Not enough artists found
+        recommendations = filtered_data.sample(len(filtered_data))["Name"].tolist()
+        return recommendations, "Not enough artists matched your criteria. Try broadening your search."
+    else:
+        # Randomly select 5 artists
+        recommendations = filtered_data.sample(5)["Name"].tolist()
+        return recommendations, None  # No additional message
+
+app = Flask(__name__)
+
+@app.route("/")
+def index():
+    genres = data["Genre"].unique()
+    locations = data["Location"].unique()
+    return render_template("index.html", genres=genres, locations=locations)
+
+@app.route("/recommend", methods=["POST"])
+def recommend():
+    genre = request.form.get("genre")
+    subgenre = request.form.get("subgenre")
+    location = request.form.get("location")
+    min_discography = int(request.form.get("min_discography", 0))
+    min_deals = int(request.form.get("min_deals", 0))
+
+    recommendations, message = recommend_artists(
+        genre, subgenre, location, min_discography, min_deals
+    )
+
+    return render_template("recommendations.html", recommendations=recommendations, message=message)
+
+if __name__ == "__main__":
+    app.run(debug=True)
